@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLCA Matrix Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Layout: lab-bench tool. Left: 5x5 matrix as live progress map + total. Right: one element card at a time. */
+  --bg: #eef0f2;
+  --surface: #ffffff;
+  --ink: #1b2229;
+  --muted: #5d6873;
+  --line: #d5dae0;
+  --accent: #1f5fa8;
+  --accent-soft: #e2ecf8;
+  --s0: #f6d4cf; --s1: #f8e1c4; --s2: #f4ecbf; --s3: #dcebc8; --s4: #c6e4cf;
+  --s-ink: #1b2229;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171c; --surface: #1b222a; --ink: #e6ebf0; --muted: #9aa6b2; --line: #2d3742;
+    --accent: #6ea8ec; --accent-soft: #1d3150;
+    --s0: #5a2a26; --s1: #5a4022; --s2: #524b20; --s3: #34482a; --s4: #22473a; --s-ink: #eef2f5;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171c; --surface: #1b222a; --ink: #e6ebf0; --muted: #9aa6b2; --line: #2d3742;
+  --accent: #6ea8ec; --accent-soft: #1d3150;
+  --s0: #5a2a26; --s1: #5a4022; --s2: #524b20; --s3: #34482a; --s4: #22473a; --s-ink: #eef2f5;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); padding: 20px 16px 40px; }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+@media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } }
+h1 { font: 700 26px/1.15 var(--display); margin: 0 0 4px; text-wrap: balance; letter-spacing: .2px; }
+.sub { color: var(--muted); margin: 0 0 16px; font-size: 14px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.side { display: grid; gap: 14px; position: sticky; top: 16px; }
+@media (max-width: 860px) { .side { position: static; } }
+label.fl { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 4px; }
+input[type=text], textarea { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+textarea { min-height: 70px; resize: vertical; }
+input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.matrix { display: grid; grid-template-columns: 92px repeat(5, 1fr); gap: 4px; font-size: 11px; }
+.matrix .hd { color: var(--muted); text-align: center; line-height: 1.2; align-self: end; padding-bottom: 2px; }
+.matrix .rl { color: var(--muted); line-height: 1.2; align-self: center; }
+.cell { aspect-ratio: 1; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--muted); font: 600 15px var(--mono); cursor: pointer; display: grid; place-items: center; padding: 0; }
+.cell.sc0 { background: var(--s0); color: var(--s-ink); } .cell.sc1 { background: var(--s1); color: var(--s-ink); }
+.cell.sc2 { background: var(--s2); color: var(--s-ink); } .cell.sc3 { background: var(--s3); color: var(--s-ink); }
+.cell.sc4 { background: var(--s4); color: var(--s-ink); }
+.cell.on { outline: 2px solid var(--accent); outline-offset: 1px; }
+.total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.big { font: 700 40px/1 var(--display); font-variant-numeric: tabular-nums; }
+.big small { font-size: 18px; color: var(--muted); font-weight: 600; }
+.count { color: var(--muted); font-size: 13px; }
+.btn { font: 600 14px var(--body); border-radius: 6px; padding: 9px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+:root[data-theme="dark"] .btn.primary { color: #0d1620; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.primary { color: #0d1620; } }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.dlrow { display: grid; gap: 8px; }
+.msg { font-size: 13px; color: var(--muted); min-height: 1.2em; }
+.card-hd { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
+.tag { font: 600 13px var(--mono); background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 2px 8px; }
+.card h2 { font: 700 22px/1.2 var(--display); margin: 0; text-wrap: balance; }
+.hint { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; font-size: 14px; margin: 12px 0 4px; }
+.hint b { color: var(--accent); }
+.q { border-top: 1px solid var(--line); padding: 14px 0 4px; }
+.q .k { font: 600 12px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+.q p { margin: 4px 0 10px; max-width: 68ch; }
+.yn { display: flex; gap: 8px; }
+.yn button { min-width: 72px; }
+.yn button.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+:root[data-theme="dark"] .yn button.sel { color: #0d1620; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .yn button.sel { color: #0d1620; } }
+.checks { display: grid; gap: 8px; margin: 6px 0 4px; }
+.checks label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.checks input { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--accent); flex: none; }
+.result { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 14px; margin-top: 10px; }
+.pill { font: 700 22px var(--mono); width: 48px; height: 48px; border-radius: 8px; display: grid; place-items: center; background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+.pill.sc0 { background: var(--s0); color: var(--s-ink); } .pill.sc1 { background: var(--s1); color: var(--s-ink); }
+.pill.sc2 { background: var(--s2); color: var(--s-ink); } .pill.sc3 { background: var(--s3); color: var(--s-ink); }
+.pill.sc4 { background: var(--s4); color: var(--s-ink); }
+.why { color: var(--muted); font-size: 14px; flex: 1; min-width: 180px; }
+.ovr { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.ovr button { font: 600 13px var(--mono); width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.ovr button.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.notes { margin-top: 14px; }
+.tgl { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); margin-top: 10px; cursor: pointer; }
+.tgl input { accent-color: var(--accent); }
+footer { max-width: 1120px; margin: 24px auto 0; font-size: 12px; color: var(--muted); }
+footer a { color: var(--accent); }
+.nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; }
+@media (prefers-reduced-motion: no-preference) { .cell, .btn, .pill { transition: background-color .15s, border-color .15s; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side">
+    <div>
+      <h1>SLCA Product Matrix Quiz</h1>
+      <p class="sub">Answer each element's questions. Scores follow the handout's rules: 0 if the 0 condition applies, 4 if the 4 condition applies, otherwise 1 to 3 from the checklist.</p>
+    </div>
+    <div class="panel">
+      <label class="fl" for="product">Product</label>
+      <input type="text" id="product" placeholder="e.g., Silicone rubber spatula">
+      <label class="tgl" for="showex"><input type="checkbox" id="showex" checked> Show worked example notes (silicone spatula)</label>
+    </div>
+    <div class="panel">
+      <div class="matrix" id="matrix" aria-label="Matrix progress"></div>
+    </div>
+    <div class="panel dlrow">
+      <div class="total">
+        <div class="big" id="total">0<small> / 100</small></div>
+        <div class="count" id="count">0 of 25 scored</div>
+      </div>
+      <button class="btn primary" id="dl" disabled>Download Excel file</button>
+      <div class="msg" id="dlmsg">Preparing download…</div>
+    </div>
+  </aside>
+  <main class="panel card" id="card"></main>
+</div>
+<footer>Scoring criteria adapted and condensed from the Environmentally Responsible Product Matrix scoring guidelines (Appendix A) in T. E. Graedel, <i>Streamlined Life-Cycle Assessment</i>, Prentice Hall, 1998. Check the original text for exact wording. Worked-example notes are estimates for a teaching example, not data. Your answers are saved only in this browser.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const STAGES = ["Premanufacture", "Product Manufacture", "Packaging & Transport", "Product Use", "Recycling & Disposal"];
+const STAGE_SHORT = ["1 Premfg", "2 Mfg", "3 Pack/Ship", "4 Use", "5 Disposal"];
+const STRESSORS = ["Materials Choice", "Energy Use", "Solid Residues", "Liquid Residues", "Gaseous Residues"];
+const STR_SHORT = ["Matl", "Energy", "Solid", "Liquid", "Gas"];
+
+const E = [
+ // 1 Premanufacture
+ { zero: "Supplier components come with little or no information on their chemical content. OR a scarce material is used when a reasonable alternative exists (antimony, beryllium, boron, cobalt, chromium, gold, mercury, platinum metals, silver, thorium, uranium).",
+   four: "No virgin material is used in incoming components or materials.",
+   checks: ["Designed to minimize materials in restricted supply", "Uses recycled materials or components wherever possible"],
+   hint: "Silicone isn't on the scarce list. Platinum-cured grades carry a trace (ppm) of platinum catalyst; peroxide-cured grades avoid it." },
+ { zero: "A principal material needs energy-intensive extraction (virgin aluminum, virgin steel, virgin petroleum) and suitable alternatives exist.",
+   four: "Negligible energy is needed to extract or ship the materials or components.",
+   checks: ["Minimizes virgin materials with energy-intensive extraction", "Avoids high-density materials (specific gravity > 7.0) that cost a lot of energy to ship", "Transport distance of incoming materials is minimized"],
+   hint: "Silicon metal is made from quartz in an electric arc furnace, which is energy heavy, but silicone isn't one of the three named materials. It's light, so shipping energy is low." },
+ { zero: "Virgin ore metals create large waste rock residues and suitable recycled material is available. OR all incoming packaging is virgin and has three or more materials.",
+   four: "All of these apply: no solid residues from extracting or producing the materials (e.g., recycled feedstock); no or minimal incoming packaging, or the supplier takes it all back; incoming packaging is totally reused or recycled.",
+   checks: ["Minimizes materials whose extraction makes large solid residues (coal, virgin metals)", "Minimizes materials that make toxic solid residues (incl. radioactive)", "Incoming packaging volume and weight minimized at all levels", "Material diversity minimized in incoming packaging"],
+   hint: "Quartz mining and silicon smelting leave slag and fines. The rest depends on how your silicone supplier packages it." },
+ { zero: "Virgin ore metals that cause acid mine drainage are used and recycled material is available (copper, iron, nickel, lead, zinc). OR incoming packaging contains toxic substances that could leak if disposed of improperly.",
+   four: "Both apply: no liquid residues from extracting or producing the materials (e.g., recycling); no liquid residue from transporting, unpacking or using supplier components.",
+   checks: ["Minimizes materials whose extraction makes large liquid residues (paper, coal, biomass)", "Minimizes materials that make toxic liquid residues (Al, Cr, Cu, Fe, Pb, Hg, Ni, Zn)", "Refillable or reusable containers are used for incoming liquids", "Cleaning incoming parts needs little water and no special-disposal liquids"],
+   hint: "An all-silicone spatula uses none of the acid-drainage metals. Check how the raw silicone and pigments arrive." },
+ { zero: "Materials cause substantial toxic, smog-forming or greenhouse emissions and alternatives exist (aluminum, chromium, copper, iron, lead, mercury, nickel, zinc, paper, concrete).",
+   four: "No gaseous residues from extracting or producing the materials (e.g., recycling).",
+   checks: ["Minimizes materials whose extraction makes large gaseous residues (Al, Cu, Fe, Pb, Ni, Zn)"],
+   hint: "Silicone isn't on the named list, but chlorosilane chemistry releases HCl and the arc furnace emits CO₂." },
+ // 2 Manufacture
+ { zero: "Manufacturing needs relatively large amounts of restricted (see 1,1), toxic and/or radioactive materials.",
+   four: "Materials used in manufacturing are completely closed loop with minimal inputs.",
+   checks: ["Processes avoid materials in restricted supply", "Toxic material is avoided or minimized", "Radioactive material is avoided", "Virgin material is minimized", "Chemical treatment of materials and parts is minimized"],
+   hint: "Cured silicone is non-toxic. Look at the curing system and the pigments." },
+ { zero: "Energy use for manufacturing or testing is high and less energy-intensive alternatives exist.",
+   four: "Manufacturing and testing need no or minimal energy.",
+   checks: ["Minimizes energy-intensive processing steps", "Minimizes energy-intensive testing", "Uses co-generation, heat exchangers or other waste-energy recovery", "Facility is powered down when not in use"],
+   hint: "Compression or liquid injection molding needs heated molds. Peroxide-cured grades also need a post-cure bake." },
+ { zero: "Solid manufacturing residues are large and no reuse or recycling programs exist.",
+   four: "Solid residues are minor and each constituent is more than 90% reused or recycled.",
+   checks: ["Solid residues minimized and reused as much as possible", "Resale of residues as inputs to other processes investigated and done", "Residues with no resale value are minimized and recycled"],
+   hint: "Silicone is a thermoset, so flash and scrap can't be reground into new parts. Hitting >90% recycled is hard." },
+ { zero: "Liquid manufacturing residues are large and no reuse or recycling programs exist.",
+   four: "Liquid residues are minor and each constituent is more than 90% reused or recycled.",
+   checks: ["Solvents and oils minimized, alternatives investigated", "Sale of liquid residues as inputs investigated and done", "Processes use the most recycled (not virgin) liquid process chemicals possible"],
+   hint: "Mold release agents and mold-cleaning solvents are the main liquid residues." },
+ { zero: "Gaseous residues are large with no reuse or recycling programs. OR CFCs are used in manufacturing.",
+   four: "Gaseous residues are relatively minor and reuse or recycling programs are in place.",
+   checks: ["No HCFCs used, or alternatives investigated and implemented", "No greenhouse gases used or generated in any process", "Resale of gaseous residues as inputs investigated and done"],
+   hint: "Peroxide cure gives off volatile byproducts during post-cure. Platinum cure is cleaner here (a trade-off with 1,1)." },
+ // 3 Packaging & Transport
+ { zero: "All outgoing packaging is from virgin sources and has three or more materials.",
+   four: "No outgoing packaging, or minimal recycled packaging.",
+   checks: ["Packaging uses few materials and is optimized for weight and volume", "Uses recycled material, and is recyclable and marked as such", "Recycling infrastructure exists for the packaging materials", "Packaging engineer and installers were consulted during design"],
+   hint: "Depends on your packaging. A recycled paper band can score 3 or 4. A virgin plastic blister on a card with a hang tab scores 0." },
+ { zero: "Packaging material extraction, the packaging procedure and transport are all energy intensive and less intensive options exist.",
+   four: "Packaging and transport all need little or no energy.",
+   checks: ["Packaging procedures avoid energy-intensive steps", "Supply and distribution plans minimize energy", "No energy-intensive installation is needed", "Long-distance, energy-intensive transport (e.g., air freight) avoided"],
+   hint: "Light and compact. Mostly comes down to shipping distance and mode." },
+ { zero: "Outgoing packaging is excessive, with little thought given to recycling or reuse.",
+   four: "Minimal or no outgoing packaging, and/or the packaging is totally reused or recycled.",
+   checks: ["Packaging materials are easy to separate", "No packaging needs special disposal after unpacking", "Volume and weight minimized at all levels", "Take-back is arranged for reuse or recycling", "Material diversity is minimized"],
+   hint: "Minimal paper packaging with recycling marks scores well here." },
+ { zero: "Packaging contains a toxic or hazardous substance that could leak if disposed of improperly (e.g., battery acid).",
+   four: "Little or no liquid residue from packaging, transport or installation.",
+   checks: ["Refillable or reusable containers used for any liquid products", "Packaging operations need no water-heavy cleaning or special-disposal liquids", "Unpacking needs no such cleaning"],
+   hint: "A dry product with simple packaging: liquid residues are unlikely." },
+ { zero: "Abundant gaseous residues come from packaging or transport, and alternatives would cut emissions significantly.",
+   four: "Little or no gaseous residue from packaging, transport or installation.",
+   checks: ["Any pressurized gases can't be released in transport (or there are none)", "Distribution plans minimize vehicle emissions", "Packaging releases no toxic gases if incinerated"],
+   hint: "Mostly truck or ship emissions. Avoid PVC packaging if it might be incinerated." },
+ // 4 Use
+ { zero: "Consumables contain significant restricted-supply or toxic/hazardous materials.",
+   four: "Use and maintenance need no consumables.",
+   checks: ["Consumable material minimized", "Alternatives to disposing of the product after use were examined", "Materials chosen so nothing toxic is released during use", "Any consumables come from recycled rather than virgin material"],
+   hint: "A spatula needs no consumables. Likely a 4." },
+ { zero: "Use or maintenance is relatively energy intensive and less intensive methods exist.",
+   four: "Use and maintenance need little or no energy.",
+   checks: ["Designed to minimize energy in service", "Maintenance and repair energy minimized", "Has energy-saving features where relevant", "Can monitor or show its energy use where relevant"],
+   hint: "No energy beyond washing. Likely a 4." },
+ { zero: "Significant hazardous or toxic solid residue during use or repair/maintenance.",
+   four: "No (or only minor) solid residue during use or repair/maintenance.",
+   checks: ["Periodic disposal of solids (cartridges, containers, batteries) avoided or minimized", "Alternatives to solid consumables investigated", "Less harmful options for any intentional emissions to land investigated"],
+   hint: "No residue in normal use. Silicone resists heat and wear, so it lasts. Likely a 4." },
+ { zero: "Significant hazardous or toxic liquid residue during use or repair/maintenance.",
+   four: "No (or only minor) liquid residue during use or repair/maintenance.",
+   checks: ["Periodic disposal of liquids (lubricants, hydraulic fluids) avoided or minimized", "Alternatives to liquid consumables investigated", "Less harmful options for any intentional emissions to water investigated", "Measures prevent unintended liquid release"],
+   hint: "Only dish soap and water. Likely a 4." },
+ { zero: "Significant hazardous or toxic gaseous residue during use or repair/maintenance.",
+   four: "No (or only minor) gaseous residue during use or repair/maintenance.",
+   checks: ["Periodic emissions (CO₂, SO₂, VOCs, CFCs) avoided or minimized", "Alternatives to gaseous consumables investigated", "Less harmful options for any intentional emissions to air investigated", "Measures prevent unintended gas release"],
+   hint: "Cured food-grade silicone doesn't off-gas at cooking temperatures. Likely a 4." },
+ // 5 Disposal
+ { zero: "Contains significant mercury, asbestos or cadmium that is not clearly identified and easily removable.",
+   four: "Material diversity minimized, the product is easy to disassemble, and all parts are recyclable.",
+   checks: ["Materials chosen for the intended end of life (recycling, incineration, refurbishment)", "Number of different materials minimized", "Materials are easy to identify and separate", "Battery-free", "Free of PCBs and PCTs", "Major plastics free of brominated flame retardants and heavy-metal additives (colorants, stabilizers)"],
+   hint: "Single material is a plus, but silicone isn't curbside recyclable, so the 4 condition isn't met. Check pigments for heavy metals." },
+ { zero: "Recycling or disposal is relatively energy intensive compared with similar products (because of weight, construction or complexity).",
+   four: "Energy for recycling or disposal is minimal.",
+   checks: ["Minimizes energy-intensive disassembly steps", "Designed for high-level reuse (direct reuse over degraded reuse)", "Transport to recycling isn't energy intensive (weight, volume, facility location)"],
+   hint: "Nothing to disassemble, but specialty silicone recyclers are few and often far away." },
+ { zero: "Product is mostly unrecyclable solid material (rubber, fiberglass, compound polymers).",
+   four: "Easily refurbished and reused, easily dismantled, and 100% reused or recycled. No part goes to landfill.",
+   checks: ["Assembled with clips or hook-and-loop rather than adhesives, potting or welds", "Avoids joining dissimilar materials in hard-to-reverse ways", "All plastics carry ISO markings", "If mostly plastic, one dominant resin (more than 80% by weight)", "Leased rather than sold"],
+   hint: "Silicone rubber is a thermoset elastomer, and the 0 condition names rubber. Likely 0 unless you run a take-back program." },
+ { zero: "Product contains mostly unrecyclable liquids.",
+   four: "No operating liquids (oils, coolants, hydraulic fluid), and no cleaning agents or solvents needed to recondition it.",
+   checks: ["Liquids can be recovered at disassembly", "Disassembly generates no liquid residues", "Materials recovery generates no liquid residues"],
+   hint: "No operating liquids and nothing to recondition. Likely a 4." },
+ { zero: "Contains or produces mostly unrecyclable gases that escape at end of life.",
+   four: "No substances lost to evaporation or sublimation (other than water), and no volatiles used to refurbish it.",
+   checks: ["Gases can be recovered at disassembly", "Materials recovery generates no gaseous residues", "Plastics can be incinerated without heavy pollution control (no brominated flame retardants, metal additives, polyurethane paint or plating)"],
+   hint: "Burns to silica ash, CO₂ and water with no halogens. Nothing evaporates." }
+];
+
+const KEY = "slca-quiz-v1";
+let state = { product: "", showEx: true, cur: 0, items: E.map(e => ({ zero: null, four: null, checks: e.checks.map(() => false), ovr: null, notes: "" })) };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.items && s.items.length === 25) state = s; } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+const label = i => `${Math.floor(i / 5) + 1},${(i % 5) + 1}`;
+
+function scoreOf(i) {
+  const it = state.items[i];
+  if (it.ovr !== null) return { s: it.ovr, why: "Set by you" };
+  if (it.zero === true) return { s: 0, why: "Score 0 condition applies" };
+  if (it.zero === false && it.four === true) return { s: 4, why: "Score 4 condition applies" };
+  if (it.zero === false && it.four === false) {
+    const n = it.checks.length, m = it.checks.filter(Boolean).length, f = m / n;
+    const s = f > 2 / 3 ? 3 : f > 1 / 3 ? 2 : 1;
+    return { s, why: `Checklist: ${m} of ${n} met` };
+  }
+  return { s: null, why: "Not scored yet" };
+}
+
+const $ = id => document.getElementById(id);
+function esc(t) { return String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function renderMatrix() {
+  let h = `<div></div>` + STR_SHORT.map(s => `<div class="hd">${s}</div>`).join("");
+  for (let r = 0; r < 5; r++) {
+    h += `<div class="rl">${STAGE_SHORT[r]}</div>`;
+    for (let c = 0; c < 5; c++) {
+      const i = r * 5 + c, { s } = scoreOf(i);
+      h += `<button class="cell${s !== null ? " sc" + s : ""}${i === state.cur ? " on" : ""}" data-i="${i}" aria-label="Element ${label(i)}: ${s === null ? "not scored" : "score " + s}">${s === null ? "·" : s}</button>`;
+    }
+  }
+  $("matrix").innerHTML = h;
+  let tot = 0, cnt = 0;
+  for (let i = 0; i < 25; i++) { const { s } = scoreOf(i); if (s !== null) { tot += s; cnt++; } }
+  $("total").innerHTML = `${tot}<small> / 100</small>`;
+  $("count").textContent = `${cnt} of 25 scored`;
+}
+
+function yn(name, val) {
+  return `<div class="yn"><button class="btn${val === true ? " sel" : ""}" data-a="${name}" data-v="1">Yes</button><button class="btn${val === false ? " sel" : ""}" data-a="${name}" data-v="0">No</button></div>`;
+}
+
+function renderCard() {
+  const i = state.cur, e = E[i], it = state.items[i], r = Math.floor(i / 5), c = i % 5;
+  const sc = scoreOf(i);
+  let h = `<div class="card-hd"><span class="tag">Element ${label(i)}</span><span class="count">${i + 1} of 25</span></div>
+  <h2>${STAGES[r]}: ${STRESSORS[c]}</h2>
+  ${state.showEx !== false ? `<div class="hint"><b>Worked example, silicone spatula:</b> ${esc(e.hint)}</div>` : ""}
+  <div class="q"><div class="k">Step 1 · Score 0 condition</div><p>${esc(e.zero)}</p><p><b>Does this apply to your product?</b></p>${yn("zero", it.zero)}</div>`;
+  if (it.zero === false) {
+    h += `<div class="q"><div class="k">Step 2 · Score 4 condition</div><p>${esc(e.four)}</p><p><b>Does this apply to your product?</b></p>${yn("four", it.four)}</div>`;
+  }
+  if (it.zero === false && it.four === false) {
+    h += `<div class="q"><div class="k">Step 3 · Checklist</div><p>Check each one your product meets. More than ⅔ met scores 3, more than ⅓ scores 2, otherwise 1.</p><div class="checks">` +
+      e.checks.map((t, k) => `<label for="ck${k}"><input type="checkbox" id="ck${k}" data-k="${k}"${it.checks[k] ? " checked" : ""}><span>${esc(t)}</span></label>`).join("") + `</div></div>`;
+  }
+  h += `<div class="result"><div class="pill${sc.s !== null ? " sc" + sc.s : ""}">${sc.s === null ? "·" : sc.s}</div><div class="why">${sc.why}</div>
+    <div class="ovr"><span>Change score:</span>${[0, 1, 2, 3, 4].map(n => `<button data-o="${n}" class="${it.ovr === n ? "sel" : ""}" aria-label="Set score ${n}">${n}</button>`).join("")}${it.ovr !== null ? `<button class="btn" data-o="auto" style="width:auto;height:32px;padding:0 10px">Use quiz score</button>` : ""}</div></div>
+  <div class="notes"><label class="fl" for="notes">Your reasoning (goes in the Excel file)</label><textarea id="notes" placeholder="Why this score?">${esc(it.notes)}</textarea></div>
+  <div class="nav"><button class="btn" id="prev"${i === 0 ? " disabled" : ""}>Previous</button><button class="btn primary" id="next"${i === 24 ? " disabled" : ""}>Next element</button></div>`;
+  $("card").innerHTML = h;
+}
+
+function render() { renderMatrix(); renderCard(); save(); }
+
+$("matrix").addEventListener("click", ev => { const b = ev.target.closest(".cell"); if (!b) return; state.cur = +b.dataset.i; render(); });
+$("product").value = state.product;
+$("product").addEventListener("input", ev => { state.product = ev.target.value; save(); });
+$("showex").checked = state.showEx !== false;
+$("showex").addEventListener("change", ev => { state.showEx = ev.target.checked; render(); });
+$("card").addEventListener("click", ev => {
+  const it = state.items[state.cur];
+  const a = ev.target.closest("[data-a]");
+  if (a) {
+    const v = a.dataset.v === "1";
+    if (a.dataset.a === "zero") { it.zero = v; if (v) it.four = null; }
+    else it.four = v;
+    render(); return;
+  }
+  const o = ev.target.closest("[data-o]");
+  if (o) { it.ovr = o.dataset.o === "auto" ? null : +o.dataset.o; render(); return; }
+  if (ev.target.id === "prev" && state.cur > 0) { state.cur--; render(); window.scrollTo({ top: 0 }); }
+  if (ev.target.id === "next" && state.cur < 24) { state.cur++; render(); window.scrollTo({ top: 0 }); }
+});
+$("card").addEventListener("change", ev => {
+  if (ev.target.dataset.k !== undefined) { state.items[state.cur].checks[+ev.target.dataset.k] = ev.target.checked; render(); }
+});
+$("card").addEventListener("input", ev => { if (ev.target.id === "notes") { state.items[state.cur].notes = ev.target.value; save(); } });
+
+function buildWorkbook() {
+  const wb = XLSX.utils.book_new();
+  const FIRST = 5;
+  const rows = [
+    ["Product", state.product],
+    ["Total score (out of 100)", null],
+    [],
+    ["Element", "Life Stage", "Stressor", "Score (0-4)", "How scored", "Your reasoning", "Checklist items met", "Score 0 if...", "Score 4 if..."]
+  ];
+  let tot = 0;
+  for (let i = 0; i < 25; i++) {
+    const e = E[i], it = state.items[i], sc = scoreOf(i);
+    if (sc.s !== null) tot += sc.s;
+    const met = (it.zero === false && it.four === false) ? e.checks.filter((_, k) => it.checks[k]).map(t => "• " + t).join("\n") : "";
+    rows.push([label(i), STAGES[Math.floor(i / 5)], STRESSORS[i % 5], sc.s, sc.why, it.notes, met, e.zero, e.four]);
+  }
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws["B2"] = { t: "n", f: `SUM(D${FIRST}:D${FIRST + 24})`, v: tot };
+  ws["!cols"] = [{ wch: 9 }, { wch: 22 }, { wch: 17 }, { wch: 11 }, { wch: 22 }, { wch: 40 }, { wch: 50 }, { wch: 60 }, { wch: 60 }];
+  XLSX.utils.book_append_sheet(wb, ws, "Worksheet");
+
+  const m = [["Life stage", ...STRESSORS, "Total (of 20)"]];
+  for (let r = 0; r < 5; r++) m.push([`${r + 1}. ${STAGES[r]}`, null, null, null, null, null, null]);
+  m.push(["Total (of 20)", null, null, null, null, null, null]);
+  const ms = XLSX.utils.aoa_to_sheet(m);
+  const col = n => String.fromCharCode(66 + n);
+  const colTot = [0, 0, 0, 0, 0];
+  for (let r = 0; r < 5; r++) {
+    let rt = 0;
+    for (let c = 0; c < 5; c++) {
+      const i = r * 5 + c, s = scoreOf(i).s;
+      ms[`${col(c)}${r + 2}`] = { t: "n", f: `Worksheet!D${FIRST + i}`, v: s ?? 0 };
+      rt += s ?? 0; colTot[c] += s ?? 0;
+    }
+    ms[`G${r + 2}`] = { t: "n", f: `SUM(B${r + 2}:F${r + 2})`, v: rt };
+  }
+  for (let c = 0; c < 5; c++) ms[`${col(c)}7`] = { t: "n", f: `SUM(${col(c)}2:${col(c)}6)`, v: colTot[c] };
+  ms["G7"] = { t: "n", f: "SUM(G2:G6)", v: tot };
+  ms["!cols"] = [{ wch: 26 }, { wch: 17 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 17 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, ms, "Matrix");
+  return XLSX.write(wb, { bookType: "xlsx", type: "array" });
+}
+
+let downloads = null;
+function plainSave(filename, blob) {
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function ready() { $("dl").disabled = false; $("dlmsg").textContent = "Unscored elements are left blank in the file."; }
+if (!window.XLSX) {
+  $("dlmsg").textContent = "The spreadsheet library didn't load. Check your connection and reload the page.";
+} else if (!window.claude) {
+  ready();
+} else {
+  (async () => {
+    try { downloads = await window.claude.use("downloads"); } catch (e) { downloads = null; }
+    if (downloads) ready();
+    else { $("dl").hidden = true; $("dlmsg").textContent = "Downloads aren't available in this view."; }
+  })();
+}
+
+$("dl").addEventListener("click", async () => {
+  const name = (state.product || "product").replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "_") || "product";
+  const filename = `SLCA_${name}.xlsx`;
+  try {
+    const blob = new Blob([buildWorkbook()], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    if (downloads) await downloads.save({ filename, data: blob }); else plainSave(filename, blob);
+    $("dlmsg").textContent = "Saved.";
+  } catch (err) {
+    const code = err && err.code;
+    $("dlmsg").textContent = code === "declined" ? "Download canceled." : code === "rate_limited" ? "A download prompt is already open. Try again in a moment." : "The download didn't go through. Try again.";
+  }
+});
+
+render();
+</script>
+</body>
+</html>
