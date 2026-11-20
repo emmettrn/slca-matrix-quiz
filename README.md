@@ -33,10 +33,6 @@ The download has two sheets:
 - **Worksheet:** each element with its score, how it was scored, your reasoning, the checklist items met, and the 0 and 4 conditions.
 - **Matrix:** the 5 × 5 grid with life-stage and stressor subtotals, linked to the Worksheet by formulas, so edits in Excel update the totals.
 
-## Worked example
-
-Each element shows an optional note on how a **silicone rubber spatula** might score. These notes are teaching estimates, not measured data. Turn them off with the checkbox under the product name.
-
 ## Notes
 
 - Answers are saved only in your own browser (localStorage). Nothing is sent anywhere.

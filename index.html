@@ -74,8 +74,6 @@ input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px
 .card-hd { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
 .tag { font: 600 13px var(--mono); background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 2px 8px; }
 .card h2 { font: 700 22px/1.2 var(--display); margin: 0; text-wrap: balance; }
-.hint { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; font-size: 14px; margin: 12px 0 4px; }
-.hint b { color: var(--accent); }
 .q { border-top: 1px solid var(--line); padding: 14px 0 4px; }
 .q .k { font: 600 12px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
 .q p { margin: 4px 0 10px; max-width: 68ch; }
@@ -97,8 +95,6 @@ input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px
 .ovr button { font: 600 13px var(--mono); width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
 .ovr button.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
 .notes { margin-top: 14px; }
-.tgl { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); margin-top: 10px; cursor: pointer; }
-.tgl input { accent-color: var(--accent); }
 footer { max-width: 1120px; margin: 24px auto 0; font-size: 12px; color: var(--muted); }
 footer a { color: var(--accent); }
 .nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; }
@@ -114,8 +110,7 @@ footer a { color: var(--accent); }
     </div>
     <div class="panel">
       <label class="fl" for="product">Product</label>
-      <input type="text" id="product" placeholder="e.g., Silicone rubber spatula">
-      <label class="tgl" for="showex"><input type="checkbox" id="showex" checked> Show worked example notes (silicone spatula)</label>
+      <input type="text" id="product" placeholder="e.g., Kitchen spatula">
     </div>
     <div class="panel">
       <div class="matrix" id="matrix" aria-label="Matrix progress"></div>
@@ -131,7 +126,7 @@ footer a { color: var(--accent); }
   </aside>
   <main class="panel card" id="card"></main>
 </div>
-<footer>Scoring criteria adapted and condensed from the Environmentally Responsible Product Matrix scoring guidelines (Appendix A) in T. E. Graedel, <i>Streamlined Life-Cycle Assessment</i>, Prentice Hall, 1998. Check the original text for exact wording. Worked-example notes are estimates for a teaching example, not data. Your answers are saved only in this browser.</footer>
+<footer>Scoring criteria adapted and condensed from the Environmentally Responsible Product Matrix scoring guidelines (Appendix A) in T. E. Graedel, <i>Streamlined Life-Cycle Assessment</i>, Prentice Hall, 1998. Check the original text for exact wording. Your answers are saved only in this browser.</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
@@ -144,112 +139,87 @@ const E = [
  // 1 Premanufacture
  { zero: "Supplier components come with little or no information on their chemical content. OR a scarce material is used when a reasonable alternative exists (antimony, beryllium, boron, cobalt, chromium, gold, mercury, platinum metals, silver, thorium, uranium).",
    four: "No virgin material is used in incoming components or materials.",
-   checks: ["Designed to minimize materials in restricted supply", "Uses recycled materials or components wherever possible"],
-   hint: "Silicone isn't on the scarce list. Platinum-cured grades carry a trace (ppm) of platinum catalyst; peroxide-cured grades avoid it." },
+   checks: ["Designed to minimize materials in restricted supply", "Uses recycled materials or components wherever possible"] },
  { zero: "A principal material needs energy-intensive extraction (virgin aluminum, virgin steel, virgin petroleum) and suitable alternatives exist.",
    four: "Negligible energy is needed to extract or ship the materials or components.",
-   checks: ["Minimizes virgin materials with energy-intensive extraction", "Avoids high-density materials (specific gravity > 7.0) that cost a lot of energy to ship", "Transport distance of incoming materials is minimized"],
-   hint: "Silicon metal is made from quartz in an electric arc furnace, which is energy heavy, but silicone isn't one of the three named materials. It's light, so shipping energy is low." },
+   checks: ["Minimizes virgin materials with energy-intensive extraction", "Avoids high-density materials (specific gravity > 7.0) that cost a lot of energy to ship", "Transport distance of incoming materials is minimized"] },
  { zero: "Virgin ore metals create large waste rock residues and suitable recycled material is available. OR all incoming packaging is virgin and has three or more materials.",
    four: "All of these apply: no solid residues from extracting or producing the materials (e.g., recycled feedstock); no or minimal incoming packaging, or the supplier takes it all back; incoming packaging is totally reused or recycled.",
-   checks: ["Minimizes materials whose extraction makes large solid residues (coal, virgin metals)", "Minimizes materials that make toxic solid residues (incl. radioactive)", "Incoming packaging volume and weight minimized at all levels", "Material diversity minimized in incoming packaging"],
-   hint: "Quartz mining and silicon smelting leave slag and fines. The rest depends on how your silicone supplier packages it." },
+   checks: ["Minimizes materials whose extraction makes large solid residues (coal, virgin metals)", "Minimizes materials that make toxic solid residues (incl. radioactive)", "Incoming packaging volume and weight minimized at all levels", "Material diversity minimized in incoming packaging"] },
  { zero: "Virgin ore metals that cause acid mine drainage are used and recycled material is available (copper, iron, nickel, lead, zinc). OR incoming packaging contains toxic substances that could leak if disposed of improperly.",
    four: "Both apply: no liquid residues from extracting or producing the materials (e.g., recycling); no liquid residue from transporting, unpacking or using supplier components.",
-   checks: ["Minimizes materials whose extraction makes large liquid residues (paper, coal, biomass)", "Minimizes materials that make toxic liquid residues (Al, Cr, Cu, Fe, Pb, Hg, Ni, Zn)", "Refillable or reusable containers are used for incoming liquids", "Cleaning incoming parts needs little water and no special-disposal liquids"],
-   hint: "An all-silicone spatula uses none of the acid-drainage metals. Check how the raw silicone and pigments arrive." },
+   checks: ["Minimizes materials whose extraction makes large liquid residues (paper, coal, biomass)", "Minimizes materials that make toxic liquid residues (Al, Cr, Cu, Fe, Pb, Hg, Ni, Zn)", "Refillable or reusable containers are used for incoming liquids", "Cleaning incoming parts needs little water and no special-disposal liquids"] },
  { zero: "Materials cause substantial toxic, smog-forming or greenhouse emissions and alternatives exist (aluminum, chromium, copper, iron, lead, mercury, nickel, zinc, paper, concrete).",
    four: "No gaseous residues from extracting or producing the materials (e.g., recycling).",
-   checks: ["Minimizes materials whose extraction makes large gaseous residues (Al, Cu, Fe, Pb, Ni, Zn)"],
-   hint: "Silicone isn't on the named list, but chlorosilane chemistry releases HCl and the arc furnace emits CO₂." },
+   checks: ["Minimizes materials whose extraction makes large gaseous residues (Al, Cu, Fe, Pb, Ni, Zn)"] },
  // 2 Manufacture
  { zero: "Manufacturing needs relatively large amounts of restricted (see 1,1), toxic and/or radioactive materials.",
    four: "Materials used in manufacturing are completely closed loop with minimal inputs.",
-   checks: ["Processes avoid materials in restricted supply", "Toxic material is avoided or minimized", "Radioactive material is avoided", "Virgin material is minimized", "Chemical treatment of materials and parts is minimized"],
-   hint: "Cured silicone is non-toxic. Look at the curing system and the pigments." },
+   checks: ["Processes avoid materials in restricted supply", "Toxic material is avoided or minimized", "Radioactive material is avoided", "Virgin material is minimized", "Chemical treatment of materials and parts is minimized"] },
  { zero: "Energy use for manufacturing or testing is high and less energy-intensive alternatives exist.",
    four: "Manufacturing and testing need no or minimal energy.",
-   checks: ["Minimizes energy-intensive processing steps", "Minimizes energy-intensive testing", "Uses co-generation, heat exchangers or other waste-energy recovery", "Facility is powered down when not in use"],
-   hint: "Compression or liquid injection molding needs heated molds. Peroxide-cured grades also need a post-cure bake." },
+   checks: ["Minimizes energy-intensive processing steps", "Minimizes energy-intensive testing", "Uses co-generation, heat exchangers or other waste-energy recovery", "Facility is powered down when not in use"] },
  { zero: "Solid manufacturing residues are large and no reuse or recycling programs exist.",
    four: "Solid residues are minor and each constituent is more than 90% reused or recycled.",
-   checks: ["Solid residues minimized and reused as much as possible", "Resale of residues as inputs to other processes investigated and done", "Residues with no resale value are minimized and recycled"],
-   hint: "Silicone is a thermoset, so flash and scrap can't be reground into new parts. Hitting >90% recycled is hard." },
+   checks: ["Solid residues minimized and reused as much as possible", "Resale of residues as inputs to other processes investigated and done", "Residues with no resale value are minimized and recycled"] },
  { zero: "Liquid manufacturing residues are large and no reuse or recycling programs exist.",
    four: "Liquid residues are minor and each constituent is more than 90% reused or recycled.",
-   checks: ["Solvents and oils minimized, alternatives investigated", "Sale of liquid residues as inputs investigated and done", "Processes use the most recycled (not virgin) liquid process chemicals possible"],
-   hint: "Mold release agents and mold-cleaning solvents are the main liquid residues." },
+   checks: ["Solvents and oils minimized, alternatives investigated", "Sale of liquid residues as inputs investigated and done", "Processes use the most recycled (not virgin) liquid process chemicals possible"] },
  { zero: "Gaseous residues are large with no reuse or recycling programs. OR CFCs are used in manufacturing.",
    four: "Gaseous residues are relatively minor and reuse or recycling programs are in place.",
-   checks: ["No HCFCs used, or alternatives investigated and implemented", "No greenhouse gases used or generated in any process", "Resale of gaseous residues as inputs investigated and done"],
-   hint: "Peroxide cure gives off volatile byproducts during post-cure. Platinum cure is cleaner here (a trade-off with 1,1)." },
+   checks: ["No HCFCs used, or alternatives investigated and implemented", "No greenhouse gases used or generated in any process", "Resale of gaseous residues as inputs investigated and done"] },
  // 3 Packaging & Transport
  { zero: "All outgoing packaging is from virgin sources and has three or more materials.",
    four: "No outgoing packaging, or minimal recycled packaging.",
-   checks: ["Packaging uses few materials and is optimized for weight and volume", "Uses recycled material, and is recyclable and marked as such", "Recycling infrastructure exists for the packaging materials", "Packaging engineer and installers were consulted during design"],
-   hint: "Depends on your packaging. A recycled paper band can score 3 or 4. A virgin plastic blister on a card with a hang tab scores 0." },
+   checks: ["Packaging uses few materials and is optimized for weight and volume", "Uses recycled material, and is recyclable and marked as such", "Recycling infrastructure exists for the packaging materials", "Packaging engineer and installers were consulted during design"] },
  { zero: "Packaging material extraction, the packaging procedure and transport are all energy intensive and less intensive options exist.",
    four: "Packaging and transport all need little or no energy.",
-   checks: ["Packaging procedures avoid energy-intensive steps", "Supply and distribution plans minimize energy", "No energy-intensive installation is needed", "Long-distance, energy-intensive transport (e.g., air freight) avoided"],
-   hint: "Light and compact. Mostly comes down to shipping distance and mode." },
+   checks: ["Packaging procedures avoid energy-intensive steps", "Supply and distribution plans minimize energy", "No energy-intensive installation is needed", "Long-distance, energy-intensive transport (e.g., air freight) avoided"] },
  { zero: "Outgoing packaging is excessive, with little thought given to recycling or reuse.",
    four: "Minimal or no outgoing packaging, and/or the packaging is totally reused or recycled.",
-   checks: ["Packaging materials are easy to separate", "No packaging needs special disposal after unpacking", "Volume and weight minimized at all levels", "Take-back is arranged for reuse or recycling", "Material diversity is minimized"],
-   hint: "Minimal paper packaging with recycling marks scores well here." },
+   checks: ["Packaging materials are easy to separate", "No packaging needs special disposal after unpacking", "Volume and weight minimized at all levels", "Take-back is arranged for reuse or recycling", "Material diversity is minimized"] },
  { zero: "Packaging contains a toxic or hazardous substance that could leak if disposed of improperly (e.g., battery acid).",
    four: "Little or no liquid residue from packaging, transport or installation.",
-   checks: ["Refillable or reusable containers used for any liquid products", "Packaging operations need no water-heavy cleaning or special-disposal liquids", "Unpacking needs no such cleaning"],
-   hint: "A dry product with simple packaging: liquid residues are unlikely." },
+   checks: ["Refillable or reusable containers used for any liquid products", "Packaging operations need no water-heavy cleaning or special-disposal liquids", "Unpacking needs no such cleaning"] },
  { zero: "Abundant gaseous residues come from packaging or transport, and alternatives would cut emissions significantly.",
    four: "Little or no gaseous residue from packaging, transport or installation.",
-   checks: ["Any pressurized gases can't be released in transport (or there are none)", "Distribution plans minimize vehicle emissions", "Packaging releases no toxic gases if incinerated"],
-   hint: "Mostly truck or ship emissions. Avoid PVC packaging if it might be incinerated." },
+   checks: ["Any pressurized gases can't be released in transport (or there are none)", "Distribution plans minimize vehicle emissions", "Packaging releases no toxic gases if incinerated"] },
  // 4 Use
  { zero: "Consumables contain significant restricted-supply or toxic/hazardous materials.",
    four: "Use and maintenance need no consumables.",
-   checks: ["Consumable material minimized", "Alternatives to disposing of the product after use were examined", "Materials chosen so nothing toxic is released during use", "Any consumables come from recycled rather than virgin material"],
-   hint: "A spatula needs no consumables. Likely a 4." },
+   checks: ["Consumable material minimized", "Alternatives to disposing of the product after use were examined", "Materials chosen so nothing toxic is released during use", "Any consumables come from recycled rather than virgin material"] },
  { zero: "Use or maintenance is relatively energy intensive and less intensive methods exist.",
    four: "Use and maintenance need little or no energy.",
-   checks: ["Designed to minimize energy in service", "Maintenance and repair energy minimized", "Has energy-saving features where relevant", "Can monitor or show its energy use where relevant"],
-   hint: "No energy beyond washing. Likely a 4." },
+   checks: ["Designed to minimize energy in service", "Maintenance and repair energy minimized", "Has energy-saving features where relevant", "Can monitor or show its energy use where relevant"] },
  { zero: "Significant hazardous or toxic solid residue during use or repair/maintenance.",
    four: "No (or only minor) solid residue during use or repair/maintenance.",
-   checks: ["Periodic disposal of solids (cartridges, containers, batteries) avoided or minimized", "Alternatives to solid consumables investigated", "Less harmful options for any intentional emissions to land investigated"],
-   hint: "No residue in normal use. Silicone resists heat and wear, so it lasts. Likely a 4." },
+   checks: ["Periodic disposal of solids (cartridges, containers, batteries) avoided or minimized", "Alternatives to solid consumables investigated", "Less harmful options for any intentional emissions to land investigated"] },
  { zero: "Significant hazardous or toxic liquid residue during use or repair/maintenance.",
    four: "No (or only minor) liquid residue during use or repair/maintenance.",
-   checks: ["Periodic disposal of liquids (lubricants, hydraulic fluids) avoided or minimized", "Alternatives to liquid consumables investigated", "Less harmful options for any intentional emissions to water investigated", "Measures prevent unintended liquid release"],
-   hint: "Only dish soap and water. Likely a 4." },
+   checks: ["Periodic disposal of liquids (lubricants, hydraulic fluids) avoided or minimized", "Alternatives to liquid consumables investigated", "Less harmful options for any intentional emissions to water investigated", "Measures prevent unintended liquid release"] },
  { zero: "Significant hazardous or toxic gaseous residue during use or repair/maintenance.",
    four: "No (or only minor) gaseous residue during use or repair/maintenance.",
-   checks: ["Periodic emissions (CO₂, SO₂, VOCs, CFCs) avoided or minimized", "Alternatives to gaseous consumables investigated", "Less harmful options for any intentional emissions to air investigated", "Measures prevent unintended gas release"],
-   hint: "Cured food-grade silicone doesn't off-gas at cooking temperatures. Likely a 4." },
+   checks: ["Periodic emissions (CO₂, SO₂, VOCs, CFCs) avoided or minimized", "Alternatives to gaseous consumables investigated", "Less harmful options for any intentional emissions to air investigated", "Measures prevent unintended gas release"] },
  // 5 Disposal
  { zero: "Contains significant mercury, asbestos or cadmium that is not clearly identified and easily removable.",
    four: "Material diversity minimized, the product is easy to disassemble, and all parts are recyclable.",
-   checks: ["Materials chosen for the intended end of life (recycling, incineration, refurbishment)", "Number of different materials minimized", "Materials are easy to identify and separate", "Battery-free", "Free of PCBs and PCTs", "Major plastics free of brominated flame retardants and heavy-metal additives (colorants, stabilizers)"],
-   hint: "Single material is a plus, but silicone isn't curbside recyclable, so the 4 condition isn't met. Check pigments for heavy metals." },
+   checks: ["Materials chosen for the intended end of life (recycling, incineration, refurbishment)", "Number of different materials minimized", "Materials are easy to identify and separate", "Battery-free", "Free of PCBs and PCTs", "Major plastics free of brominated flame retardants and heavy-metal additives (colorants, stabilizers)"] },
  { zero: "Recycling or disposal is relatively energy intensive compared with similar products (because of weight, construction or complexity).",
    four: "Energy for recycling or disposal is minimal.",
-   checks: ["Minimizes energy-intensive disassembly steps", "Designed for high-level reuse (direct reuse over degraded reuse)", "Transport to recycling isn't energy intensive (weight, volume, facility location)"],
-   hint: "Nothing to disassemble, but specialty silicone recyclers are few and often far away." },
+   checks: ["Minimizes energy-intensive disassembly steps", "Designed for high-level reuse (direct reuse over degraded reuse)", "Transport to recycling isn't energy intensive (weight, volume, facility location)"] },
  { zero: "Product is mostly unrecyclable solid material (rubber, fiberglass, compound polymers).",
    four: "Easily refurbished and reused, easily dismantled, and 100% reused or recycled. No part goes to landfill.",
-   checks: ["Assembled with clips or hook-and-loop rather than adhesives, potting or welds", "Avoids joining dissimilar materials in hard-to-reverse ways", "All plastics carry ISO markings", "If mostly plastic, one dominant resin (more than 80% by weight)", "Leased rather than sold"],
-   hint: "Silicone rubber is a thermoset elastomer, and the 0 condition names rubber. Likely 0 unless you run a take-back program." },
+   checks: ["Assembled with clips or hook-and-loop rather than adhesives, potting or welds", "Avoids joining dissimilar materials in hard-to-reverse ways", "All plastics carry ISO markings", "If mostly plastic, one dominant resin (more than 80% by weight)", "Leased rather than sold"] },
  { zero: "Product contains mostly unrecyclable liquids.",
    four: "No operating liquids (oils, coolants, hydraulic fluid), and no cleaning agents or solvents needed to recondition it.",
-   checks: ["Liquids can be recovered at disassembly", "Disassembly generates no liquid residues", "Materials recovery generates no liquid residues"],
-   hint: "No operating liquids and nothing to recondition. Likely a 4." },
+   checks: ["Liquids can be recovered at disassembly", "Disassembly generates no liquid residues", "Materials recovery generates no liquid residues"] },
  { zero: "Contains or produces mostly unrecyclable gases that escape at end of life.",
    four: "No substances lost to evaporation or sublimation (other than water), and no volatiles used to refurbish it.",
-   checks: ["Gases can be recovered at disassembly", "Materials recovery generates no gaseous residues", "Plastics can be incinerated without heavy pollution control (no brominated flame retardants, metal additives, polyurethane paint or plating)"],
-   hint: "Burns to silica ash, CO₂ and water with no halogens. Nothing evaporates." }
+   checks: ["Gases can be recovered at disassembly", "Materials recovery generates no gaseous residues", "Plastics can be incinerated without heavy pollution control (no brominated flame retardants, metal additives, polyurethane paint or plating)"] }
 ];
 
 const KEY = "slca-quiz-v1";
-let state = { product: "", showEx: true, cur: 0, items: E.map(e => ({ zero: null, four: null, checks: e.checks.map(() => false), ovr: null, notes: "" })) };
+let state = { product: "", cur: 0, items: E.map(e => ({ zero: null, four: null, checks: e.checks.map(() => false), ovr: null, notes: "" })) };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.items && s.items.length === 25) state = s; } catch (e) {}
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 
@@ -296,7 +266,6 @@ function renderCard() {
   const sc = scoreOf(i);
   let h = `<div class="card-hd"><span class="tag">Element ${label(i)}</span><span class="count">${i + 1} of 25</span></div>
   <h2>${STAGES[r]}: ${STRESSORS[c]}</h2>
-  ${state.showEx !== false ? `<div class="hint"><b>Worked example, silicone spatula:</b> ${esc(e.hint)}</div>` : ""}
   <div class="q"><div class="k">Step 1 · Score 0 condition</div><p>${esc(e.zero)}</p><p><b>Does this apply to your product?</b></p>${yn("zero", it.zero)}</div>`;
   if (it.zero === false) {
     h += `<div class="q"><div class="k">Step 2 · Score 4 condition</div><p>${esc(e.four)}</p><p><b>Does this apply to your product?</b></p>${yn("four", it.four)}</div>`;
@@ -317,8 +286,6 @@ function render() { renderMatrix(); renderCard(); save(); }
 $("matrix").addEventListener("click", ev => { const b = ev.target.closest(".cell"); if (!b) return; state.cur = +b.dataset.i; render(); });
 $("product").value = state.product;
 $("product").addEventListener("input", ev => { state.product = ev.target.value; save(); });
-$("showex").checked = state.showEx !== false;
-$("showex").addEventListener("change", ev => { state.showEx = ev.target.checked; render(); });
 $("card").addEventListener("click", ev => {
   const it = state.items[state.cur];
   const a = ev.target.closest("[data-a]");
