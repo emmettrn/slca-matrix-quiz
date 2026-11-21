@@ -43,6 +43,16 @@ The download has two sheets:
 
 Open `index.html` in a browser. An internet connection is needed for the spreadsheet library.
 
-## Reference
+## Source and citation
 
-Graedel, T. E. (1998). *Streamlined Life-Cycle Assessment*. Prentice Hall.
+The questions in this quiz (each element's "score 0" condition, "score 4" condition and checklist) are condensed and paraphrased from:
+
+> Graedel, T. E. (1998). Appendix A: Environmentally responsible product matrix: Scoring guidelines and protocols. In *Streamlined life-cycle assessment* (pp. 235–249). Prentice Hall. ISBN 0-13-607425-1
+
+The matrix itself is described in Chapter 7 of the same book ("Product Assessment by SLCA Matrix Approaches"). The matrix method was first published in:
+
+> Graedel, T. E., Allenby, B. R., & Comrie, P. R. (1995). Matrix approaches to abridged life cycle assessment. *Environmental Science & Technology, 29*(3), 134A–139A. https://doi.org/10.1021/es00003a751
+
+The 1/3 and 2/3 checklist cutoffs used to pick a 1, 2 or 3 are this tool's own convention, not part of the original guidelines.
+
+If you use this tool in your work, please cite the Graedel book above for the scoring criteria.
